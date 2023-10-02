@@ -15,6 +15,12 @@ struct weightedInterval {
     U weight;
 };
 
+template <typename T, typename U>
+struct knapsackItem {
+    T value;
+    U weight;
+};
+
 template <typename T>
 std::ostream& operator<<(std::ostream& out, std::vector<T> vec) {
     out << "{";
@@ -83,6 +89,44 @@ U scheduleIntervals(
     return maxWithIntervals1TOi[intervals.size()];
 }
 
+// 0/1-KNAPSACK PROBLEM
+template <typename T, typename U>
+T knapsackMaxValue(
+    std::vector<knapsackItem<T,U>> items,
+    U capacityWeight
+) {
+    std::vector< std::vector<T> > maxValues;
+    int n = items.size();
+
+    maxValues.resize(capacityWeight + 1);
+    for (int i = 0; i <= capacityWeight; ++i) {
+        maxValues[i].resize(n + 1);
+    }
+
+    // SETUP COMPLETE
+    for (int i = 0; i <= capacityWeight; ++i) {
+        maxValues[i][0] = 0;
+    }
+    for (int i = 0; i <= n; ++i) {
+        maxValues[0][i] = 0;
+    }
+
+    for (int i = 1; i <= n; ++i) {
+
+        for (int w = 1; w <= capacityWeight; ++w) {
+            if (items[i-1].weight > w) {
+                maxValues[w][i] = maxValues[w][i-1];
+            } else {
+                T a = maxValues[w - items[i-1].weight][i-1] + items[i-1].value;
+                T b = maxValues[w][i-1];
+                maxValues[w][i] = std::max(a,b);
+            }
+            // std::cout << "(w, i) = {" << w << ", " << i << "}: " << maxValues[w][i] << '\n';
+        }
+    }
+    return maxValues[capacityWeight][n];
+}
+
 int main() {
     std::cout << fib(1) << '\n';
     std::cout << fib(2) << '\n';
@@ -91,8 +135,13 @@ int main() {
     std::cout << fib(5) << '\n';
     std::cout << fib(10) << '\n';
 
-    std::vector<weightedInterval<int, int>> vec1{
+    std::vector<weightedInterval<int, int>> scheduleVec{
         {2,8,6}, {2,4,2}, {5,6,1}, {7,9,2}
     };
-    std::cout << scheduleIntervals<int, int>(vec1) << '\n';
+    std::cout << scheduleIntervals<int, int>(scheduleVec) << '\n';
+
+    std::vector<knapsackItem<int, int>> knapsackItems1 {
+        {2,3}, {3,4}, {1,6}, {5,5}
+    };
+    std::cout << knapsackMaxValue<int, int>(knapsackItems1, 8) << '\n';
 }
