@@ -127,6 +127,61 @@ T knapsackMaxValue(
     return maxValues[capacityWeight][n];
 }
 
+// LONGEST INCREASING SUBSEQUENCE
+template <typename T>
+size_t longestIncreasingSubsequence(
+    std::vector<T>& vec
+) {
+    std::vector<T> longestSoFarEndingHere(vec.size());
+    size_t max = 0;
+
+    longestSoFarEndingHere[0] = 1;
+    for (int i = 1; i < vec.size(); ++i) {
+        longestSoFarEndingHere[i] = 1;
+        for (int j = 0; j < i; ++j) {
+            if (vec[j] < vec[i]) {
+                longestSoFarEndingHere[i] = std::max(
+                    longestSoFarEndingHere[i],
+                    longestSoFarEndingHere[j] + 1
+                );
+            }
+        }
+        if (longestSoFarEndingHere[i] > max)
+            max = longestSoFarEndingHere[i];
+    }
+    return max;
+}
+
+// LONGEST COMMON SUBSEQUENCE PROBLEM
+int longestCommonSubsequence(std::string& a, std::string& b) {
+    size_t aSize = a.size(), bSize = b.size();
+    std::vector< std::vector<int> > M;
+    M.resize(aSize + 1);
+    for (int i = 0; i <= aSize; ++i) {
+        M[i].resize(bSize + 1);
+    }
+
+    for (int i = 0; i <= aSize; ++i) {
+        M[i][0] = 0;
+    }
+    for (int i = 0; i <= bSize; ++i) {
+        M[0][i] = 0;
+    }
+
+    for (int i = 1; i <= aSize; ++i) {
+        for (int j = 1; j <= bSize; ++j) {
+            if (a[i] == b[j]) {
+                M[i][j] = M[i-1][j-1] + 1;
+                M[i][j] = std::max(M[i][j-1], M[i][j]);
+                M[i][j] = std::max(M[i][j], M[i-1][j]);
+            } else {
+                M[i][j] = std::max(M[i][j-1], M[i-1][j]);
+            }
+        }
+    }
+    return M[aSize][bSize];
+}
+
 int main() {
     std::cout << fib(1) << '\n';
     std::cout << fib(2) << '\n';
@@ -144,4 +199,12 @@ int main() {
         {2,3}, {3,4}, {1,6}, {5,5}
     };
     std::cout << knapsackMaxValue<int, int>(knapsackItems1, 8) << '\n';
+
+    std::vector<int> increasingSubVec1{
+        7, 1, 3, 10, 11, 5, 19
+    };
+    std::cout << longestIncreasingSubsequence<int>(increasingSubVec1) << '\n';
+
+    std::string a = "blurry", b = "burger";
+    std::cout << longestCommonSubsequence(a, b) << "\n";
 }
