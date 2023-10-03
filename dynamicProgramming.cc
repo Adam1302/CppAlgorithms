@@ -153,7 +153,7 @@ size_t longestIncreasingSubsequence(
 }
 
 // LONGEST COMMON SUBSEQUENCE PROBLEM
-int longestCommonSubsequence(std::string& a, std::string& b) {
+size_t longestCommonSubsequence(std::string& a, std::string& b) {
     size_t aSize = a.size(), bSize = b.size();
     std::vector< std::vector<int> > M;
     M.resize(aSize + 1);
@@ -182,6 +182,36 @@ int longestCommonSubsequence(std::string& a, std::string& b) {
     return M[aSize][bSize];
 }
 
+// MINIMUM EDIT DISTANCE
+size_t minEditDistance(std::string& a, std::string& b) {
+    size_t aSize = a.size(), bSize = b.size();
+    std::vector< std::vector<int> > M;
+    M.resize(aSize + 1);
+    for (int i = 0; i <= aSize; ++i) {
+        M[i].resize(bSize + 1);
+    }
+
+    for (int i = 0; i <= aSize; ++i) {
+        M[i][0] = i;
+    }
+    for (int i = 0; i <= bSize; ++i) {
+        M[0][i] = i;
+    }
+
+    // SETUP COMPLETE
+
+    for (int i = 1; i <= aSize; ++i) {
+        for (int j = 1; j <= bSize; ++j) {
+            size_t prev = M[i-1][j-1];
+            if (!(a[i] == b[j])) prev++;
+            M[i][j] = prev;
+            M[i][j] = std::min(M[i][j], M[i-1][j] + 1);
+            M[i][j] = std::min(M[i][j], M[i][j-1] + 1);
+        }
+    }
+    return M[aSize][bSize];
+}
+
 int main() {
     std::cout << fib(1) << '\n';
     std::cout << fib(2) << '\n';
@@ -205,6 +235,9 @@ int main() {
     };
     std::cout << longestIncreasingSubsequence<int>(increasingSubVec1) << '\n';
 
-    std::string a = "blurry", b = "burger";
-    std::cout << longestCommonSubsequence(a, b) << "\n";
+    std::string a1 = "blurry", b1 = "burger";
+    std::cout << longestCommonSubsequence(a1, b1) << "\n";
+
+    std::string a2 = "snowy", b2 = "sunny";
+    std::cout << minEditDistance(a2, b2) << "\n";
 }
